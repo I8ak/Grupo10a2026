@@ -14,7 +14,7 @@ services:
     user: mysql
   phpmyadmina0:
     image: phpmyadmin
-    container_name: phpmyadmin
+    container_name: phpmyadmina0
     restart: always
     environment:
       - PMA_HOST=mariadb
@@ -38,7 +38,7 @@ services:
   apachea0:
     build: ./apache #./waf/ en un futuro
     ports:
-      - 6000:80
+      - 60010:80
     depends_on:
       - pythona0
     links:
