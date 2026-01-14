@@ -1,7 +1,7 @@
 services:
   mariadba0:
     image: mariadb
-    container_name: mariadb
+    container_name: mariadba0
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: example
@@ -24,7 +24,7 @@ services:
       - mariadba0
   pythona0:
     build: ./api
-    container_name: python
+    container_name: pythona0
     environment:
       DB_USERNAME: root
       DB_PASSWORD: example
