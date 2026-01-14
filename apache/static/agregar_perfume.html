@@ -16,13 +16,13 @@
         function guardar(){
             let nombre=document.getElementById("nombre").value;
             let descripcion=document.getElementById("descripcion").value;
-            let ingredientes =document.getElementById("ingredientes").value;
+            let notas =document.getElementById("notas").value;
             let precio=document.getElementById("precio").value;
             let foto=document.getElementById("foto").value;
             let datos=JSON.stringify({
                 "nombre":nombre,
                 "descripcion":descripcion,
-                "ingredientes":ingredientes,
+                "notas":notas,
                 "precio":precio,
                 "foto":foto
             });
@@ -32,12 +32,12 @@
                 body: datos
             };
 
-            fetch("/api/chuches/", requestOptions)
+            fetch("/api/perfumes/", requestOptions)
                 .then(response => response.json())
                 .then(result => {
                     if (result.status == "OK"){
                         alert("Chuche guardada")
-                        location.href="chuches.html"
+                        location.href="perfumes.html"
                     } else {
                         alert("La chuche no ha podido ser guardado")
                     }
@@ -61,7 +61,7 @@
         </div>
         <div class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item" href="chuches.html">Chuches</a>
+                <a class="navbar-item" href="perfumes.html">perfumes</a>
             </div>
             <div class="navbar-end">
                 <div class="navbar-item">
@@ -77,15 +77,15 @@
                 <input required type="text" class="input" placeholder="Nombre" name="nombre" id="nombre">
                 <label for="descripcion">Descripcion</label>
                 <input required type="text" class="input" placeholder="Descripcion" name="descripcion" id="descripcion">
-                <label for="ingredientesS">Ingredientes</label>
-                <input required type="text" class="input" placeholder="Ingredientes" name="ingredientes" id="ingredientes">
+                <label for="notasS">notas</label>
+                <input required type="text" class="input" placeholder="notas" name="notas" id="notas">
                 <label for="precio">Precio</label>
                 <input required type="number" class="input" placeholder="Precio" name="precio" id="precio">
                 <label for="foto">Foto</label>
                 <input required type="text" class="input" placeholder="Foto" name="foto" id="foto">                
                 <input required type="file" class="input" placeholder="Archivo Foto" name="filefoto" id="filefoto">
                 <button type="button" onclick="guardar()" class="button is-success mt-2">Guardar</button>
-                <a href="chuches.html" class="button is-primary mt-2">Volver</a>
+                <a href="perfumes.html" class="button is-primary mt-2">Volver</a>
             </form>
         </div>
     </div>

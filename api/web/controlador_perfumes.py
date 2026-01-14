@@ -9,43 +9,43 @@ def convertir_chuche_a_json(chuche):
     d['descripcion'] = chuche[2]
     d['precio'] = float(chuche[3])
     d['foto'] = chuche[4]
-    d['ingredientes']=chuche[5]
+    d['notas']=chuche[5]
     return d
 
-def insertar_chuche(nombre, descripcion, precio,foto,ingredientes):
+def insertar_chuche(nombre, descripcion, precio,foto,notas):
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
-        cursor.execute("INSERT INTO chuches(nombre, descripcion, precio,foto,ingredientes) VALUES (%s, %s, %s,%s,%s)",
-                       (nombre, descripcion, precio,foto,ingredientes))
+        cursor.execute("INSERT INTO perfumes(nombre, descripcion, precio,foto,notas) VALUES (%s, %s, %s,%s,%s)",
+                       (nombre, descripcion, precio,foto,notas))
     conexion.commit()
     conexion.close()
     ret={"status": "OK" }
     code=200
     return ret,code
 
-def obtener_chuches():
-    chuchesjson=[]
+def obtener_perfumes():
+    perfumesjson=[]
     try:
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT id, nombre, descripcion, precio,foto,ingredientes FROM chuches")
-            chuches = cursor.fetchall()
-            if chuches:
-                for chuche in chuches:
-                    chuchesjson.append(convertir_chuche_a_json(chuche))
+            cursor.execute("SELECT id, nombre, descripcion, precio,foto,notas FROM perfumes")
+            perfumes = cursor.fetchall()
+            if perfumes:
+                for chuche in perfumes:
+                    perfumesjson.append(convertir_chuche_a_json(chuche))
         conexion.close()
         code=200
     except:
-        print("Excepcion al consultar todas las chuches", flush=True)
+        print("Excepcion al consultar todas las perfumes", flush=True)
         code=500
-    return chuchesjson,code
+    return perfumesjson,code
 
 def obtener_chuche_por_id(id):
     chuchejson = {}
     try:
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT id, nombre, descripcion, precio,foto,ingredientes FROM chuches WHERE id =" + id)
+            cursor.execute("SELECT id, nombre, descripcion, precio,foto,notas FROM perfumes WHERE id =" + id)
             chuche = cursor.fetchone()
             if chuche is not None:
                 chuchejson = convertir_chuche_a_json(chuche)
@@ -59,7 +59,7 @@ def eliminar_chuche(id):
     try:
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
-            cursor.execute("DELETE FROM chuches WHERE id = %s", (id,))
+            cursor.execute("DELETE FROM perfumes WHERE id = %s", (id,))
             if cursor.rowcount == 1:
                 ret={"status": "OK" }
             else:
@@ -73,12 +73,12 @@ def eliminar_chuche(id):
         code=500
     return ret,code
 
-def actualizar_chuche(id, nombre, descripcion, precio, foto,ingredientes):
+def actualizar_chuche(id, nombre, descripcion, precio, foto,notas):
     try:
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
-            cursor.execute("UPDATE chuches SET nombre = %s, descripcion = %s, precio = %s, foto=%s, ingredientes=%s WHERE id = %s",
-                       (nombre, descripcion, precio, foto,ingredientes,id))
+            cursor.execute("UPDATE perfumes SET nombre = %s, descripcion = %s, precio = %s, foto=%s, notas=%s WHERE id = %s",
+                       (nombre, descripcion, precio, foto,notas,id))
             if cursor.rowcount == 1:
                 ret={"status": "OK" }
             else:

@@ -15,9 +15,9 @@
         var myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         onload=function(){
-            pedirChuches();
+            pedirperfumes();
         }
-        function pintarChuches(lista){
+        function pintarperfumes(lista){
             let tbody=document.getElementsByTagName("tbody")[0];
             tbody.innerText="";
 
@@ -26,7 +26,7 @@
                         <td><img src="${chuche.foto}" width="70"></td>
                         <td>${chuche.nombre}</td>
                         <td>${chuche.descripcion}</td>
-                        <td>${chuche.ingredientes}</td>
+                        <td>${chuche.notas}</td>
                         <td>${chuche.precio}</td>
                         <td>${chuche.precio}</td>
                         <td>`
@@ -39,21 +39,21 @@
                 tbody.innerHTML+=texto                            
             });
         }
-        function pedirChuches(){
+        function pedirperfumes(){
             var requestOptions = {
                 method: 'GET',
                 headers: myHeaders,
             };
 
-            fetch("/api/chuches/", requestOptions)
+            fetch("/api/perfumes/", requestOptions)
                 .then(response => response.json())
                 .then(result => {
                     console.log(result);
-                    pintarChuches(result);
+                    pintarperfumes(result);
                 })
                 .catch(error => {
                     console.log('error', error);
-                    alert("Ha habido un error al recuperar las chuches. Refresque la página")
+                    alert("Ha habido un error al recuperar las perfumes. Refresque la página")
                 });
         }
         function eliminarChuche(id){
@@ -62,12 +62,12 @@
                 headers: myHeaders,
             };
 
-            fetch("/api/chuches/"+id, requestOptions)
+            fetch("/api/perfumes/"+id, requestOptions)
                 .then(response => response.json())
                 .then(result => {
                     if (result.status == "OK"){
                         alert("Chuche eliminado")
-                        pedirChuches();
+                        pedirperfumes();
                     } else {
                         alert("La chuche no ha podido ser eliminada")
                     }
@@ -111,7 +111,7 @@
         </div>
         <div class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item" href="chuches.html">Chuches</a>
+                <a class="navbar-item" href="perfumes.html">perfumes</a>
                 <a class="navbar-item" href="ficheros.html">Archivos</a>
                 <a class="navbar-item" href="javascript:cerrarSesion()">Cerrar sesion</a>
             </div>
@@ -124,7 +124,7 @@
     <section class="section">
         <div class="columns">
             <div class="column">
-                <h3 class="is-size-3">Chuches</h3>
+                <h3 class="is-size-3">perfumes</h3>
                 <a id="enlaceAgregar" href="agregar_chuche.html" class="button is-success">Agregar</a>
                 <table class="table">
                     <thead>
@@ -132,7 +132,7 @@
                             <th>Imagen</th>
                             <th>Nombre</th>
                             <th>Descripcion</th>
-                            <th>Ingredientes</th>
+                            <th>notas</th>
                             <th>Precio</th>
                             <th>PrecioIVA</th>
                             <th>Editar</th>
