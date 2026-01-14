@@ -36,15 +36,15 @@
                 .then(response => response.json())
                 .then(result => {
                     if (result.status == "OK"){
-                        alert("Chuche guardada")
+                        alert("perfume guardada")
                         location.href="perfumes.html"
                     } else {
-                        alert("La chuche no ha podido ser guardado")
+                        alert("La perfume no ha podido ser guardado")
                     }
                 })
                 .catch(error => {
                     console.log('error', error);
-                    alert("Se ha producido un error y la chuche no ha podido ser guardado")
+                    alert("Se ha producido un error y la perfume no ha podido ser guardado")
                 });
         }
     </script>
@@ -72,7 +72,7 @@
   <section class="section">
     <div class="columns">
         <div class="column">
-            <h3 class="is-size-3">Agregar Chuche</h3>
+            <h3 class="is-size-3">Agregar perfume</h3>
                 <label for="nombre">Nombre:</label>
                 <input required type="text" class="input" placeholder="Nombre" name="nombre" id="nombre">
                 <label for="descripcion">Descripcion</label>

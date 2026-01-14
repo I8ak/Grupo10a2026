@@ -2,17 +2,17 @@ from bd import obtener_conexion
 import sys
 
 
-def convertir_chuche_a_json(chuche):
+def convertir_perfume_a_json(perfume):
     d = {}
-    d['id'] = chuche[0]
-    d['nombre'] = chuche[1]
-    d['descripcion'] = chuche[2]
-    d['precio'] = float(chuche[3])
-    d['foto'] = chuche[4]
-    d['notas']=chuche[5]
+    d['id'] = perfume[0]
+    d['nombre'] = perfume[1]
+    d['descripcion'] = perfume[2]
+    d['precio'] = float(perfume[3])
+    d['foto'] = perfume[4]
+    d['notas']=perfume[5]
     return d
 
-def insertar_chuche(nombre, descripcion, precio,foto,notas):
+def insertar_perfume(nombre, descripcion, precio,foto,notas):
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
         cursor.execute("INSERT INTO perfumes(nombre, descripcion, precio,foto,notas) VALUES (%s, %s, %s,%s,%s)",
@@ -31,8 +31,8 @@ def obtener_perfumes():
             cursor.execute("SELECT id, nombre, descripcion, precio,foto,notas FROM perfumes")
             perfumes = cursor.fetchall()
             if perfumes:
-                for chuche in perfumes:
-                    perfumesjson.append(convertir_chuche_a_json(chuche))
+                for perfume in perfumes:
+                    perfumesjson.append(convertir_perfume_a_json(perfume))
         conexion.close()
         code=200
     except:
@@ -40,22 +40,22 @@ def obtener_perfumes():
         code=500
     return perfumesjson,code
 
-def obtener_chuche_por_id(id):
-    chuchejson = {}
+def obtener_perfume_por_id(id):
+    perfumejson = {}
     try:
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
             cursor.execute("SELECT id, nombre, descripcion, precio,foto,notas FROM perfumes WHERE id =" + id)
-            chuche = cursor.fetchone()
-            if chuche is not None:
-                chuchejson = convertir_chuche_a_json(chuche)
+            perfume = cursor.fetchone()
+            if perfume is not None:
+                perfumejson = convertir_perfume_a_json(perfume)
         conexion.close()
         code=200
     except:
-        print("Excepcion al consultar una chuche", flush=True)
+        print("Excepcion al consultar una perfume", flush=True)
         code=500
-    return chuchejson,code
-def eliminar_chuche(id):
+    return perfumejson,code
+def eliminar_perfume(id):
     try:
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
@@ -68,12 +68,12 @@ def eliminar_chuche(id):
         conexion.close()
         code=200
     except:
-        print("Excepcion al eliminar una chuche", flush=True)
+        print("Excepcion al eliminar una perfume", flush=True)
         ret = {"status": "Failure" }
         code=500
     return ret,code
 
-def actualizar_chuche(id, nombre, descripcion, precio, foto,notas):
+def actualizar_perfume(id, nombre, descripcion, precio, foto,notas):
     try:
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
@@ -87,7 +87,7 @@ def actualizar_chuche(id, nombre, descripcion, precio, foto,notas):
         conexion.close()
         code=200
     except:
-        print("Excepcion al actualziar una chuche", flush=True)
+        print("Excepcion al actualziar una perfume", flush=True)
         ret = {"status": "Failure" }
         code=500
     return ret,code

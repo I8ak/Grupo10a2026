@@ -19,9 +19,9 @@
         var urlParams = new URLSearchParams(queryString);
         var id = urlParams.get('id');
         onload = function () {
-            obtenerDatosChuche(id);
+            obtenerDatosperfume(id);
         }
-        function obtenerDatosChuche(id) {
+        function obtenerDatosperfume(id) {
             var requestOptions = {
                 method: 'GET',
                 headers: myHeaders
@@ -29,21 +29,21 @@
 
             fetch("/api/perfumes/" + id, requestOptions)
                 .then(response => response.json())
-                .then(result => pintarChuche(result))
+                .then(result => pintarperfume(result))
                 .catch(error => {
                     alert("Ha habido un error al recuperar los datos del libro");
                     location.href = "perfumes.html";
                 });
 
         }
-        function pintarChuche(chuche) {
-            console.log(chuche);
+        function pintarperfume(perfume) {
+            console.log(perfume);
             
-            document.getElementById("nombre").value = chuche.nombre;
-            document.getElementById("descripcion").value = chuche.descripcion;
-            document.getElementById("notas").value = chuche.notas;
-            document.getElementById("precio").value = chuche.precio;
-            document.getElementById("foto").src = chuche.foto;
+            document.getElementById("nombre").value = perfume.nombre;
+            document.getElementById("descripcion").value = perfume.descripcion;
+            document.getElementById("notas").value = perfume.notas;
+            document.getElementById("precio").value = perfume.precio;
+            document.getElementById("foto").src = perfume.foto;
         }
 
         function guardar() {
@@ -76,15 +76,15 @@
                 .then(result => {
                     
                     if (result.status == "OK") {
-                        alert("chuche modificado")
+                        alert("perfume modificado")
                         location.href = "perfumes.html"
                     } else {
-                        alert("La chuche no ha podido ser modificado")
+                        alert("La perfume no ha podido ser modificado")
                     }
                 })
                 .catch(error => {
                     console.log('error', error);
-                    alert("Se ha producido un error y la chuche no ha podido ser modificado")
+                    alert("Se ha producido un error y la perfume no ha podido ser modificado")
                 });
         }
     </script>
@@ -113,7 +113,7 @@
     <section class="section">
         <div class="columns">
             <div class="column">
-                <h3 class="is-size-3">Editar chuche</h3>
+                <h3 class="is-size-3">Editar perfume</h3>
                 <label for="nombre">Nombre:</label>
                 <input required type="text" class="input" placeholder="Nombre" name="nombre" id="nombre">
                 <label for="descripcion">Descripcion</label>

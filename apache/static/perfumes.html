@@ -21,19 +21,19 @@
             let tbody=document.getElementsByTagName("tbody")[0];
             tbody.innerText="";
 
-            lista.forEach(chuche => {
+            lista.forEach(perfume => {
                 let texto=`<tr>
-                        <td><img src="${chuche.foto}" width="70"></td>
-                        <td>${chuche.nombre}</td>
-                        <td>${chuche.descripcion}</td>
-                        <td>${chuche.notas}</td>
-                        <td>${chuche.precio}</td>
-                        <td>${chuche.precio}</td>
+                        <td><img src="${perfume.foto}" width="70"></td>
+                        <td>${perfume.nombre}</td>
+                        <td>${perfume.descripcion}</td>
+                        <td>${perfume.notas}</td>
+                        <td>${perfume.precio}</td>
+                        <td>${perfume.precio}</td>
                         <td>`
-                texto+=`<a href="editar_chuche.html?id=${chuche.id}" class="button is-info">Editar</a>
+                texto+=`<a href="editar_perfume.html?id=${perfume.id}" class="button is-info">Editar</a>
                         </td>
                         <td>
-                            <button class="button is-danger" onclick="eliminarChuche(${chuche.id})">Eliminar</button>
+                            <button class="button is-danger" onclick="eliminarperfume(${perfume.id})">Eliminar</button>
                         </td>`
                 texto+=`</tr>`;
                 tbody.innerHTML+=texto                            
@@ -56,7 +56,7 @@
                     alert("Ha habido un error al recuperar las perfumes. Refresque la página")
                 });
         }
-        function eliminarChuche(id){
+        function eliminarperfume(id){
             var requestOptions = {
                 method: 'DELETE',
                 headers: myHeaders,
@@ -66,15 +66,15 @@
                 .then(response => response.json())
                 .then(result => {
                     if (result.status == "OK"){
-                        alert("Chuche eliminado")
+                        alert("perfume eliminado")
                         pedirperfumes();
                     } else {
-                        alert("La chuche no ha podido ser eliminada")
+                        alert("La perfume no ha podido ser eliminada")
                     }
                 })
                 .catch(error => {
                     console.log('error', error);
-                    alert("Se ha producido un error y la chuche no ha podido ser eliminado")
+                    alert("Se ha producido un error y la perfume no ha podido ser eliminado")
                 });
         }
         function cerrarSesion(){
@@ -125,7 +125,7 @@
         <div class="columns">
             <div class="column">
                 <h3 class="is-size-3">perfumes</h3>
-                <a id="enlaceAgregar" href="agregar_chuche.html" class="button is-success">Agregar</a>
+                <a id="enlaceAgregar" href="agregar_perfume.html" class="button is-success">Agregar</a>
                 <table class="table">
                     <thead>
                         <tr>
