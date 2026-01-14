@@ -53,7 +53,7 @@
                 })
                 .catch(error => {
                     console.log('error', error);
-                    alert("Ha habido un error al recuperar las perfumes. Refresque la página")
+                    alert("Ha habido un error al recuperar los perfumes. Refresque la página")
                 });
         }
         function eliminarperfume(id){
@@ -66,15 +66,15 @@
                 .then(response => response.json())
                 .then(result => {
                     if (result.status == "OK"){
-                        alert("perfume eliminado")
+                        alert("Perfume eliminado")
                         pedirperfumes();
                     } else {
-                        alert("La perfume no ha podido ser eliminada")
+                        alert("El perfume no ha podido ser eliminada")
                     }
                 })
                 .catch(error => {
                     console.log('error', error);
-                    alert("Se ha producido un error y la perfume no ha podido ser eliminado")
+                    alert("Se ha producido un error y el perfume no ha podido ser eliminado")
                 });
         }
         function cerrarSesion(){
@@ -111,7 +111,7 @@
         </div>
         <div class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item" href="perfumes.html">perfumes</a>
+                <a class="navbar-item" href="perfumes.html">Perfumes</a>
                 <a class="navbar-item" href="ficheros.html">Archivos</a>
                 <a class="navbar-item" href="javascript:cerrarSesion()">Cerrar sesion</a>
             </div>
@@ -124,7 +124,7 @@
     <section class="section">
         <div class="columns">
             <div class="column">
-                <h3 class="is-size-3">perfumes</h3>
+                <h3 class="is-size-3">Perfumes</h3>
                 <a id="enlaceAgregar" href="agregar_perfume.html" class="button is-success">Agregar</a>
                 <table class="table">
                     <thead>
@@ -132,7 +132,7 @@
                             <th>Imagen</th>
                             <th>Nombre</th>
                             <th>Descripcion</th>
-                            <th>notas</th>
+                            <th>Notas</th>
                             <th>Precio</th>
                             <th>PrecioIVA</th>
                             <th>Editar</th>
