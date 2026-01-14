@@ -76,15 +76,15 @@
                 .then(result => {
                     
                     if (result.status == "OK") {
-                        alert("perfume modificado")
+                        alert("Perfume modificado")
                         location.href = "perfumes.html"
                     } else {
-                        alert("La perfume no ha podido ser modificado")
+                        alert("El perfume no ha podido ser modificado")
                     }
                 })
                 .catch(error => {
                     console.log('error', error);
-                    alert("Se ha producido un error y la perfume no ha podido ser modificado")
+                    alert("Se ha producido un error y el perfume no ha podido ser modificado")
                 });
         }
     </script>
