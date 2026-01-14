@@ -14,7 +14,7 @@ services:
     user: mysql
   phpmyadmina0:
     image: phpmyadmin
-    container_name: phpmyadmina0
+    container_name: phpmyadmin
     restart: always
     environment:
       - PMA_HOST=mariadb
