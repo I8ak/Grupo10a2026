@@ -1,7 +1,7 @@
 services:
   mariadba0:
-    image: mariadba0
-    container_name: mariadba0
+    image: mariadb
+    container_name: mariadb
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: example
@@ -13,18 +13,18 @@ services:
       - ./perfumes.sql://docker-entrypoint-initdb.d/perfumes.sql:ro
     user: mysql
   phpmyadmina0:
-    image: phpmyadmina0
+    image: phpmyadmin
     container_name: phpmyadmina0
     restart: always
     environment:
-      - PMA_HOST=mariadba0
+      - PMA_HOST=mariadb
     ports:
       - 7000:80
     depends_on:
       - mariadba0
   pythona0:
     build: ./api
-    container_name: pythona0
+    container_name: python
     environment:
       DB_USERNAME: root
       DB_PASSWORD: example
