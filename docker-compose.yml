@@ -1,7 +1,7 @@
 services:
-  mariadb:
-    image: mariadb
-    container_name: mariadb
+  mariadba0:
+    image: mariadba0
+    container_name: mariadba0
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: example
@@ -9,39 +9,39 @@ services:
       MARIADB_USER_PASSWORD: 0traClave
       MARIADB_DATABASE: ciber
     volumes:
-      - mariadb_data:/var/lib/mysql
+      - mariadba0_dataa0:/var/lib/mysql
       - ./perfumes.sql://docker-entrypoint-initdb.d/perfumes.sql:ro
     user: mysql
-  phpmyadmin:
-    image: phpmyadmin
-    container_name: phpmyadmin
+  phpmyadmina0:
+    image: phpmyadmina0
+    container_name: phpmyadmina0
     restart: always
     environment:
-      - PMA_HOST=mariadb
+      - PMA_HOST=mariadba0
     ports:
-      - 9093:80
+      - 7000:80
     depends_on:
-      - mariadb
-  python:
+      - mariadba0
+  pythona0:
     build: ./api
-    container_name: python
+    container_name: pythona0
     environment:
       DB_USERNAME: root
       DB_PASSWORD: example
       DB_DATABASE: ciber
-      DB_HOST: mariadb
+      DB_HOST: mariadba0
       DB_PORT: 3306
       PORT: 8080
       HOST: 0.0.0.0
     depends_on:
-      - mariadb
-  apache-waf:
+      - mariadba0
+  apachea0:
     build: ./apache #./waf/ en un futuro
     ports:
-      - 9090:80
+      - 6000:80
     depends_on:
-      - python
+      - pythona0
     links:
-      - python
+      - pythona0
 volumes:
-  mariadb_data:
+  mariadba0_dataa0:
