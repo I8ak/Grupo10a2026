@@ -1,7 +1,7 @@
 services:
   mariadba0:
     image: mariadb
-    container_name: mariadb
+    container_name: mariadb0
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: example
