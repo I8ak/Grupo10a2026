@@ -1,47 +1,45 @@
+
 services:
-  mariadba0:
+  mariadba10:
     image: mariadb
-    container_name: mariadba0
-    restart: always
-    environment:
-      MARIADB_ROOT_PASSWORD: example
-      MARIADB_USER: agente
-      MARIADB_USER_PASSWORD: 0traClave
-      MARIADB_DATABASE: ciber
+    container_name: mariadba10
+    restart: unless-stopped
+    env_file:
+      - .env
     volumes:
-      - mariadba0_dataa0:/var/lib/mysql
-      - ./perfumes.sql://docker-entrypoint-initdb.d/perfumes.sql:ro
-    user: mysql
-  phpmyadmina0:
+      - mariadb-dataa10:/var/lib/mysql
+      - ./perfumes.sql:/docker-entrypoint-initdb.d/perfumes.sql:ro
+
+  phpmyadmina10:
     image: phpmyadmin
-    container_name: phpmyadmina0
-    restart: always
+    container_name: phpmyadmina10
+    restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      - PMA_HOST=mariadb
+      PMA_HOST: mariadba10
     ports:
-      - 7000:80
+      - "7010:80"
     depends_on:
-      - mariadba0
-  pythona0:
+      - mariadba10
+
+  pythona10:
     build: ./api
-    container_name: pythona0
-    environment:
-      DB_USERNAME: root
-      DB_PASSWORD: example
-      DB_DATABASE: ciber
-      DB_HOST: mariadba0
-      DB_PORT: 3306
-      PORT: 8080
-      HOST: 0.0.0.0
+    container_name: pythona10
+    restart: unless-stopped
+    env_file:
+      - .env
     depends_on:
-      - mariadba0
-  apachea0:
-    build: ./apache #./waf/ en un futuro
+      - mariadba10
+
+  apachea10:
+    build: ./apache
+    container_name: apachea10
+    restart: unless-stopped
     ports:
-      - 60010:80
+      - "60010:80"
     depends_on:
-      - pythona0
-    links:
-      - pythona0
+      - pythona10
+
 volumes:
-  mariadba0_dataa0:
+  mariadb-dataa10:
