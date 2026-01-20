@@ -1,6 +1,6 @@
 from flask import request, Blueprint, jsonify
 import controlador_perfumes
-from funciones_auxiliares import Encoder
+from funciones_auxiliares import Encoder, calcularIVA
 
 bp = Blueprint('perfumes', __name__)
 
@@ -21,10 +21,10 @@ def guardar_perfume():
         perfume_json = request.json
         nombre = perfume_json["nombre"]
         descripcion = perfume_json["descripcion"]
-        precio=perfume_json["precio"]
-        foto=perfume_json["foto"]
-        notas=perfume_json["notas"]
-        respuesta,code=controlador_perfumes.insertar_perfume(nombre, descripcion,precio,foto,notas)
+        precio = calcularIVA(perfume_json["precio"])
+        foto = perfume_json["foto"]
+        notas = perfume_json["notas"]
+        respuesta, code = controlador_perfumes.insertar_perfume(nombre, descripcion, precio, foto, notas)
     else:
         respuesta={"status":"Bad request"}
         code=401
