@@ -1,6 +1,6 @@
 from bd import obtener_conexion
 import sys
-
+from funciones_auxiliares import calcularIVA
 
 def convertir_perfume_a_json(perfume):
     d = {}
@@ -23,22 +23,38 @@ def insertar_perfume(nombre, descripcion, precio,foto,notas):
     code=200
     return ret,code
 
+# 1. No olvides importar tu función al principio del archivo
+from funciones_auxiliares import calcularIVA
+
 def obtener_perfumes():
-    perfumesjson=[]
+    perfumesjson = []
     try:
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT id, nombre, descripcion, precio,foto,notas FROM perfumes")
+            # Ejecutamos la consulta
+            cursor.execute("SELECT id, nombre, descripcion, precio, foto, notas FROM perfumes")
             perfumes = cursor.fetchall()
+            
             if perfumes:
                 for perfume in perfumes:
-                    perfumesjson.append(convertir_perfume_a_json(perfume))
+                    # Convertimos la tupla/fila a un diccionario JSON
+                    p_json = convertir_perfume_a_json(perfume)
+                    
+                    # 2. AQUÍ calculamos el IVA y creamos la nueva clave
+                    # Accedemos al precio que ya está en el diccionario y calculamos el total
+                    p_json['precio_iva'] = calcularIVA(p_json['precio'])
+                    
+                    # Añadimos el objeto ya completo a la lista
+                    perfumesjson.append(p_json)
+                    
         conexion.close()
-        code=200
-    except:
-        print("Excepcion al consultar todas las perfumes", flush=True)
-        code=500
-    return perfumesjson,code
+        code = 200
+    except Exception as e:
+        # Es mejor imprimir el error real para saber qué falla
+        print(f"Excepcion al consultar todos los perfumes: {e}", flush=True)
+        code = 500
+        
+    return perfumesjson, code
 
 def obtener_perfume_por_id(id):
     perfumejson = {}
