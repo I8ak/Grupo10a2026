@@ -8,4 +8,3 @@ class Encoder(json.JSONEncoder):
     
 def calcularIVA(importe):
         return importe * 1.21
-
