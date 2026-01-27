@@ -19,3 +19,4 @@ CREATE TABLE usuarios(
     perfil VARCHAR(100) NOT NULL
 );
 INSERT INTO `usuarios` (`usuario`, `clave`, `perfil`) VALUES ('root','1234', 'admin');
+INSERT INTO 'perfumes' (`id`, `nombre`, `descripcion`, `precio`, `foto`, `notas`) VALUES (``, `Sauvage`, `100 ml`, `150`, /apache/static/Sauvage.png,``)
