@@ -2,7 +2,7 @@ import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
-BASE_URL = os.getenv("http://10.227.87.30:60010")
+BASE_URL = os.getenv("APP_URL")
 
 def test_xss_login():
     options = webdriver.ChromeOptions()
