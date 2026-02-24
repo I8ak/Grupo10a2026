@@ -14,7 +14,7 @@ driver = webdriver.Chrome(service=service, options=options)
 
 try:
     print("Iniciando DAST con Selenium...")
-    driver.get("http://localhost:5000") # La URL de tu app en Docker Compose
+    driver.get("http://10.227.89.30:60010") # La URL de tu app en Docker Compose
     print(f"Título de la página: {driver.title}")
     
     # Aquí puedes añadir lógica para buscar 'vulnerabilidades'
