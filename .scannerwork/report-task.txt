@@ -2,5 +2,5 @@ projectKey=Grupo10A2026
 serverUrl=http://localhost:9000
 serverVersion=25.12.0.117093
 dashboardUrl=http://localhost:9000/dashboard?id=Grupo10A2026
-ceTaskId=329df745-4c6a-470a-bfa4-39fea2960d22
-ceTaskUrl=http://localhost:9000/api/ce/task?id=329df745-4c6a-470a-bfa4-39fea2960d22
+ceTaskId=72a01a38-dc54-4965-864f-b66d1d59b463
+ceTaskUrl=http://localhost:9000/api/ce/task?id=72a01a38-dc54-4965-864f-b66d1d59b463
