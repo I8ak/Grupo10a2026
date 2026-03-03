@@ -1,0 +1,41 @@
+env:
+  contexts:
+    - name: app-context
+      urls:
+        - http://10.227.87.30:60010
+      includePaths:
+        - http://10.227.87.30:60010.*
+      authentication:
+        method: form
+        parameters:
+          loginPageUrl: "http://10.227.87.30:60010"
+          loginRequestUrl: "http://10.227.87.30:60010"
+          loginRequestBody: "username={%username%}&password={%password%}"
+        verification:
+          method: response
+          loggedInRegex: "Logout"
+          loggedOutRegex: "Login"
+      sessionManagement:
+        method: cookie
+      users:
+        - name: zap-user
+          credentials:
+            username: test
+            password: test123
+
+jobs:
+  - type: spider
+    parameters:
+      context: app-context
+      user: zap-user
+
+  - type: activeScan
+    parameters:
+      context: app-context
+      user: zap-user
+
+  - type: report
+    parameters:
+      template: traditional-html
+      reportDir: .
+      reportFile: zap-report.html
