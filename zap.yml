@@ -37,5 +37,5 @@ jobs:
   - type: report
     parameters:
       template: traditional-html
-      reportDir: /var/jenkins_home/workspace/PipelineGit
+      reportDir: .
       reportFile: zap-report
