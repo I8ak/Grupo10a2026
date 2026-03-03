@@ -1,29 +1,36 @@
+import os
+import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-# Configuración simplificada para la imagen de Selenium Standalone
 options = Options()
 options.add_argument("--headless")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
-options.add_argument('--disable-gpu')
-
-# NO pongas service ni binary_location. 
-# La imagen ya sabe dónde están.
 
 try:
     print("Iniciando DAST con Selenium...")
     driver = webdriver.Chrome(options=options)
     
-    # IMPORTANTE: Asegúrate de usar la IP correcta que detectamos en el Jenkinsfile
-    # Si usas APP_URL como variable de entorno, úsala aquí:
-    import os
-    app_url = os.getenv('APP_URL', 'http://172.17.0.1:5000')
+    # IMPORTANTE: 
+    # 1. Usamos la IP que Jenkins nos pasa (el Gateway)
+    # 2. Usamos el puerto 60010 porque el Gateway redirige al host
+    app_url = os.getenv('APP_URL', 'http://172.17.0.1:60010')
     
-    driver.get(app_url)
+    # REINTENTOS: Por si el contenedor 'pythona10' está reiniciando
+    for i in range(10):
+        try:
+            print(f"Intento {i+1}: Conectando a {app_url}...")
+            driver.get(app_url)
+            if "Iniciado" in driver.title or driver.title != "": # Verifica que cargó algo
+                break
+        except Exception as e:
+            print(f"Esperando a la aplicación... {e}")
+            time.sleep(5)
+    
     print(f"Título de la página: {driver.title}")
     
-    # Tu lógica de seguridad...
+    # Tu lógica de cookies...
     cookies = driver.get_cookies()
     for cookie in cookies:
         if not cookie.get('httpOnly'):
