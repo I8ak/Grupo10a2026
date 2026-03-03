@@ -37,5 +37,5 @@ jobs:
   - type: report
     parameters:
       template: traditional-html
-      reportDir: .
+      reportDir: /zap/wrk/
       reportFile: zap-report
