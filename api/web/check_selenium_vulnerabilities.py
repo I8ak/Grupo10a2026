@@ -24,8 +24,8 @@ def run_login_tests():
 
             # TEST 1
             log_file.write("Ejecutando Test 1: Login Fallido\n")
-            driver.find_element(By.ID, "username").send_keys("usuario_falso")
-            driver.find_element(By.ID, "password").send_keys("clave_falsa")
+            driver.find_element(By.ID, "username").send_keys("root")
+            driver.find_element(By.ID, "password").send_keys("1234")
             driver.find_element(By.XPATH, "//button[contains(text(),'ENVIAR')]").click()
             time.sleep(5)
             
