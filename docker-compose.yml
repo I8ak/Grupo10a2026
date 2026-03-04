@@ -4,11 +4,15 @@ services:
     image: mariadb
     container_name: mariadba10
     restart: unless-stopped
-    env_file:
-      - .env
+    env_file: [.env]
     volumes:
       - mariadb-dataa10:/var/lib/mysql
       - ./Perfumes.sql:/docker-entrypoint-initdb.d/perfumes.sql:ro
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "root", "-pexample"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   phpmyadmina10:
     image: phpmyadmin
@@ -27,19 +31,19 @@ services:
     build: ./api
     container_name: pythona10
     restart: unless-stopped
-    env_file:
-      - .env
+    env_file: [.env]
     depends_on:
-      - mariadba10
+      mariadba10:
+        condition: service_healthy
 
   apachea10:
     build: ./apache
     container_name: apachea10
     restart: unless-stopped
-    ports:
-      - "60010:80"
+    ports: ["60010:80"]
     depends_on:
-      - pythona10
+      pythona10:
+        condition: service_started
 
 volumes:
   mariadb-dataa10:

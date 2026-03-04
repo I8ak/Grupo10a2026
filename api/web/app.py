@@ -30,11 +30,16 @@ def create_app():
     return app
 
 if __name__ == '__main__':
-    app=create_app()
-    #cargarvariables() # ocultar en caso de lanzar todos los contenedores
+    app = create_app()
+    
+    # Obtenemos las variables con valores de respaldo (fallback)
+    env_port = os.environ.get('PORT', '5000')
+    env_host = os.environ.get('HOST', '0.0.0.0')
+    
     try:
-        port = int(os.environ.get('PORT'))
-        host = os.environ.get('HOST')
-        app.run(host=host, port=port)
-    except:
-        print("Error starting server", flush=True)
+        port = int(env_port)
+        print(f"Intentando arrancar en {env_host}:{port}...", flush=True)
+        app.run(host=env_host, port=port)
+    except Exception as e:
+        print(f"FALLO CRÍTICO: No se pudo arrancar el servidor. Puerto configurado: {env_port}")
+        print(f"Error detallado: {e}", flush=True)
