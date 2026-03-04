@@ -23,13 +23,15 @@ def run_login_tests():
         driver.find_element(By.ID, "username").send_keys("usuario_falso")
         driver.find_element(By.ID, "password").send_keys("clave_falsa")
         driver.find_element(By.XPATH, "//button[contains(text(),'ENVIAR')]").click()
-        time.sleep(1)
+        time.sleep(5)
+        
         
         error_msg = driver.find_element(By.CLASS_NAME, "error")
         if error_msg.is_displayed():
             print("Resultado: ÉXITO (El mensaje de error apareció correctamente)")
         else:
             print("Resultado: FALLO (El mensaje de error no es visible)")
+            driver.save_screenshot('error.png')
 
         # PRUEBA 2: Intento de SQL Injection (Seguridad)
         print("\nTest 2: Probando bypass de login con SQL Injection...")
