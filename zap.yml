@@ -2,14 +2,14 @@ env:
   contexts:
     - name: app-context
       urls:
-        - http://10.227.87.30:60010
+        - http://apachea10:80
       includePaths:
-        - http://10.227.87.30:60010.*
+        - "http://apachea10:80.*"
       authentication:
         method: form
         parameters:
-          loginPageUrl: "http://10.227.87.30:60010"
-          loginRequestUrl: "http://10.227.87.30:60010"
+          loginPageUrl: "http://apachea10:80"
+          loginRequestUrl: "http://apachea10:80"
           loginRequestBody: "username={%username%}&password={%password%}"
         verification:
           method: response
@@ -37,5 +37,5 @@ jobs:
   - type: report
     parameters:
       template: traditional-html
-      reportDir: /zap/wrk/
-      reportFile: zap-report
+      reportDir: /zap/wrk
+      reportFile: zap-report.html
