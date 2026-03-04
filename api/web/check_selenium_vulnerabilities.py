@@ -31,6 +31,9 @@ def run_login_tests():
             print("Resultado: ÉXITO (El mensaje de error apareció correctamente)")
         else:
             print("Resultado: FALLO (El mensaje de error no es visible)")
+            # FORZAMOS LA CAPTURA AQUÍ porque el test falló visualmente
+            driver.save_screenshot('error.png') 
+            print("Captura guardada como error.png")
             
 
         # PRUEBA 2: Intento de SQL Injection (Seguridad)
