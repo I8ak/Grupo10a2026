@@ -31,7 +31,7 @@ def run_login_tests():
             print("Resultado: ÉXITO (El mensaje de error apareció correctamente)")
         else:
             print("Resultado: FALLO (El mensaje de error no es visible)")
-            driver.save_screenshot('error.png')
+            
 
         # PRUEBA 2: Intento de SQL Injection (Seguridad)
         print("\nTest 2: Probando bypass de login con SQL Injection...")
@@ -49,6 +49,7 @@ def run_login_tests():
 
     except Exception as e:
         print(f"Error durante las pruebas: {e}")
+        driver.save_screenshot('error.png')
     finally:
         driver.quit()
 
