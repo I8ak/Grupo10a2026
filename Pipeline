@@ -1,0 +1,294 @@
+```
+pipeline {
+  agent any
+
+  tools {
+    dockerTool "Docker"
+  }
+
+  parameters {
+    string(name: 'IMAGE_TAG_PYTHON', defaultValue: '', description: 'Tag de la imagen Docker de python')
+    string(name: 'IMAGE_TAG_WAF', defaultValue: '', description: 'Tag de la imagen Docker de waf')
+  }
+
+  environment {
+    registrypython = "danishak123/pepsapachewafdi"
+    registrywaf = "danishak123/pepspythondi"
+    registryCredential = 'DockerHub'
+    DOCKERHUB_CREDENTIALS = credentials('DockerHub')
+    DOCKER_IMAGEPYTHON = "danishak123/pepsapachewafdi"
+    DOCKER_IMAGEWAF = "danishak123/pepspythondi"
+    FINAL_IMAGE_TAG_PYTHON = "${params.IMAGE_TAG_PYTHON}"
+    FINAL_IMAGE_TAG_WAF = "${params.IMAGE_TAG_WAF}"
+    KUBERNETES_HOST = "10.227.87.9" 
+    PYTHON_IMAGE = 'python:3.11-slim'
+    TEST_DIR = '.'
+  }
+
+  stages {
+    stage('Clonar repositorio') {
+      steps {
+        git url: 'https://github.com/I8ak/Grupo10a2026.git', branch: 'main'
+      }
+    }
+
+    stage('Prueba unitaria') {
+      agent {
+        docker {
+          image "${PYTHON_IMAGE}"
+          reuseNode true
+        }
+      }
+      steps {
+        sh """
+          pip install --no-cache-dir pytest pytest-cov
+          export PYTHONPATH=$WORKSPACE
+          pytest ${TEST_DIR} --ignore=tests/dast --ignore=api/web --cov=api/web --cov-fail-under=1 --junitxml=pytest_results.xml
+        """
+        junit 'pytest_results.xml'
+      }
+    }
+
+    stage('Security Scan - GitLeaks') {
+      agent {
+        docker {
+          image 'ghcr.io/gitleaks/gitleaks:v8.18.2'
+          args '--entrypoint=""'
+          reuseNode true
+        }
+      }
+      steps {
+        sh '''
+          gitleaks detect \
+            --source . \
+            --redact \
+            --report-format junit \
+            --report-path gitleaks-report.xml || true
+        '''
+        junit allowEmptyResults: true, testResults: 'gitleaks-report.xml'
+      }
+    }
+
+    stage('SonarQube Analysis') {
+      steps {
+        script {
+          withCredentials([string(credentialsId: 'sonar-token', variable: 'TOKEN')]) {
+            sh """
+              docker run --rm \
+                --add-host=host.docker.internal:host-gateway \
+                -e SONAR_TOKEN=${TOKEN} \
+                -v ${WORKSPACE}:/usr/src \
+                sonarsource/sonar-scanner-cli \
+                -Dsonar.projectKey=Grupo10a2026 \
+                -Dsonar.sources=. \
+                -Dsonar.host.url=http://host.docker.internal:9000 \
+                -Dsonar.login=\$SONAR_TOKEN \
+                -Dsonar.python.version=3 \
+                -Dsonar.exclusions=**/tests/**,**/node_modules/**
+            """
+          }
+        }
+      }
+    }
+
+    stage('SCA (Syft SBOM)') {
+      steps {
+        script {
+          sh """
+            docker run --rm \
+              -v ${WORKSPACE}:/src \
+              anchore/syft:latest \
+              scan dir:/src -o cyclonedx-xml > sbom.xml
+          """
+          sh "ls -lh sbom.xml && head -n 20 sbom.xml"
+        }
+        archiveArtifacts artifacts: 'sbom.xml', fingerprint: true
+      }
+    }
+
+    stage('Docker Login') {
+      steps {
+        withCredentials([usernamePassword(
+          credentialsId: 'DockerHub',
+          usernameVariable: 'DOCKER_USER',
+          passwordVariable: 'DOCKER_PASS'
+        )]) {
+          sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+        }
+      }
+    }
+    
+    stage('Build Docker python') {
+      steps {
+        script {
+          dockerImagePython = docker.build("${env.registrypython}:${env.FINAL_IMAGE_TAG_PYTHON}", "-f api/Dockerfile api")
+        }
+      }
+    }
+
+    stage('Push Docker python') {
+      steps {
+        script {
+          dockerImagePython.push(env.FINAL_IMAGE_TAG_PYTHON)
+        } 
+      }
+    }
+
+    stage('Scan Docker Image Python for Vulnerabilities') {
+      steps {
+        script {
+          sh """
+            docker run --rm \
+              -v /var/run/docker.sock:/var/run/docker.sock \
+              aquasec/trivy:latest \
+              image --severity HIGH,CRITICAL ${env.registrypython}:${env.FINAL_IMAGE_TAG_PYTHON}
+          """
+        }
+      }
+    }
+
+    stage('Build Docker WAF') {
+      when { expression { params.IMAGE_TAG_WAF?.trim() } } 
+      steps {
+        script {
+          dockerImageWaf = docker.build("${env.registrywaf}:${env.FINAL_IMAGE_TAG_WAF}", "-f apache/Dockerfile apache")
+        }
+      }
+    }
+
+    stage('Push Docker waf') {
+      when { expression { params.IMAGE_TAG_WAF?.trim() } }
+      steps {
+        script {
+          dockerImageWaf.push(env.FINAL_IMAGE_TAG_WAF)
+        }
+      }
+    }
+
+    stage('Scan Docker Image Waf for Vulnerabilities') {
+      when { expression { params.IMAGE_TAG_WAF?.trim() } }
+      steps {
+        script {
+          sh """
+            docker run --rm \
+              -v /var/run/docker.sock:/var/run/docker.sock \
+              aquasec/trivy:latest \
+              image --severity HIGH,CRITICAL ${env.registrywaf}:${env.FINAL_IMAGE_TAG_WAF}
+          """
+        }
+      }
+    }
+
+    stage('Run Application with Docker Compose') {
+      steps {
+        script {
+          sh '''
+            cat << 'EOF' > .env
+            MARIADB_ROOT_PASSWORD=example
+            MARIADB_USER=agente
+            MARIADB_USER_PASSWORD=0traClave
+            MARIADB_DATABASE=ciber
+            DB_USERNAME=root
+            DB_PASSWORD=example
+            DB_DATABASE=ciber
+EOF
+          '''
+          sh 'docker compose -f docker-compose.yml up -d'
+        }
+      }
+    }
+
+    stage('OWASP ZAP Scan') {  
+      steps {  
+        sh 'sleep 30'
+        script {  
+          catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {  
+            docker.image('ghcr.io/zaproxy/zaproxy:stable')  
+                  .inside("-v ${WORKSPACE}:/zap/wrk") {
+              sh 'zap.sh -cmd -autorun /zap/wrk/zap.yaml'  
+            }  
+          }  
+        }  
+      }
+      post {  
+        always {  
+          archiveArtifacts artifacts: 'zap-report.*',  
+                           fingerprint: true,  
+                           allowEmptyArchive: true  
+        }  
+      }
+    }
+
+    stage('E2E / Vulnerability Scan') {
+      steps {
+        script {
+          def dockerGateway = sh(script: "docker network inspect bridge --format '{{(index .IPAM.Config 0).Gateway}}'", returnStdout: true).trim()
+          sh "docker run -d --name selenium_scanner -u root selenium/standalone-chrome:latest sleep 300"
+          
+          try {
+            sh "docker cp . selenium_scanner:/app"
+            sh """
+              docker exec -w /app selenium_scanner bash -c "
+                pip install --no-cache-dir selenium==4.15.2 && \
+                export APP_URL=http://${dockerGateway}:60010 && \
+                echo 'Esperando 10 segundos...' && \
+                sleep 10 && \
+                python3 api/web/check_selenium_vulnerabilities.py
+              "
+            """
+          } finally {
+            sh "docker rm -f selenium_scanner"
+          }
+        }
+      }
+    }
+
+    stage('Deploy en Kubernetes') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'Kubernetes', 
+                                          usernameVariable: 'JUMP_USER', 
+                                          passwordVariable: 'JUMP_PASS')]) {
+          sh """
+            sshpass -p '$JUMP_PASS' ssh -o StrictHostKeyChecking=no $JUMP_USER@$KUBERNETES_HOST << 'EOF'
+              kubectl set image deployment/pythona10 \
+                pythona10=${env.registrypython}:${env.FINAL_IMAGE_TAG_PYTHON} \
+                -n grupo10a
+              kubectl rollout status deployment/pythona10 -n grupo10a
+EOF
+          """
+          script {
+            if (params.IMAGE_TAG_WAF?.trim()) {
+              sh """
+                sshpass -p '$JUMP_PASS' ssh -o StrictHostKeyChecking=no $JUMP_USER@$KUBERNETES_HOST << 'EOF'
+                  kubectl set image deployment/apachea10 \
+                    apachea10=${env.registrywaf}:${env.FINAL_IMAGE_TAG_WAF} \
+                    -n grupo10a
+                  kubectl rollout status deployment/apachea10 -n grupo10a
+EOF
+              """
+            }
+          }
+        }
+      }
+    }
+
+    stage('Clean Up') {
+      steps {
+        script {
+          sh 'docker compose down -v'
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      script {
+        if (env.WORKSPACE) { cleanWs() }
+      }
+    }
+    success { echo 'Pipeline correcto!' }
+    failure { echo 'Pipeline fallo!' }
+  }
+}
+```

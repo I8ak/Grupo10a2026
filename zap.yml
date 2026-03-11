@@ -20,8 +20,8 @@ env:
       users:
         - name: zap-user
           credentials:
-            username: test
-            password: test123
+            username: root
+            password: 1234
 
 jobs:
   - type: spider
