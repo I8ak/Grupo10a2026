@@ -1,9 +1,10 @@
 from __future__ import print_function
-from flask import request,Blueprint, jsonify
+from flask import request,Blueprint, jsonify,make_response
 import controlador_ficheros
 import os
 import sys
 import subprocess
+
 
 bp = Blueprint('ficheros', __name__)
 
@@ -17,7 +18,7 @@ def upload():
         print(f"Error subiendo archivo: {e}", flush=True)
         respuesta={"status": "ERROR"}
         code=500
-    return jsonify(respuesta), code
+    return make_response(jsonify(respuesta), code)
 
 @bp.route ('/<archivo>', methods=['GET']) 
 def ver(archivo):
@@ -26,4 +27,4 @@ def ver(archivo):
     except:
         respuesta= {"status": "ERROR"}
         code=500
-    return jsonify(respuesta), code
+    return make_response(jsonify(respuesta), code)

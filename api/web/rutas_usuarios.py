@@ -1,28 +1,43 @@
 from __future__ import print_function
-from flask import request,Blueprint, jsonify
+from flask import request,Blueprint, jsonify, make_response
 from funciones_auxiliares import Encoder
 import controlador_usuarios
+from app import csrf
+import json
 
 bp = Blueprint('usuarios', __name__)
 
-@bp.route("/login",methods=['POST'])
+@bp.route("/login",methods=['POST'], strict_slashes=False)
+@csrf.exempt
 def login():
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
-        login_json = request.json
-        username = login_json['username']
-        password = login_json['password']
-        respuesta,code= controlador_usuarios.login_usuario(username,password)
+        # CORRECCIÓN: Usamos obligatoriamente los datos sanitizados
+        login_json = request.cleaned_json
+        
+        if "username" in login_json and "password" in login_json:
+            username = login_json['username']
+            password = login_json['password']
+            if isinstance(username, str) and isinstance(password, str) and len(username) < 50 and len(password) < 50:
+                respuesta,code= controlador_usuarios.login_usuario(username,password)
+            else:
+                respuesta = {"status": "Bad parameters"}
+                code = 401
+        else:
+            respuesta = {"status": "Bad request"}
+            code = 401
     else:
         respuesta={"status":"Bad request"}
         code=401
-    return jsonify(respuesta), code
+    return make_response(jsonify(respuesta), code)
 
-@bp.route("/registro",methods=['POST'])
+@bp.route("/registro",methods=['POST'], strict_slashes=False)
+@csrf.exempt
 def registro():
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
-        login_json = request.json
+        # CORRECCIÓN: Usamos obligatoriamente los datos sanitizados
+        login_json = request.cleaned_json
         username = login_json['username']
         password = login_json['password']
         profile = login_json['profile']
@@ -30,11 +45,18 @@ def registro():
     else:
         respuesta={"status":"Bad request"}
         code=401
-    return jsonify(respuesta), code
+    return make_response(jsonify(respuesta), code)
 
 
 @bp.route("/logout",methods=['GET'])
 def logout():
-    respuesta,code= controlador_usuarios.logout()
-    return jsonify(respuesta), code
+    try:
+        controlador_usuarios.logout()
+        ret = {"status": "OK"}
+        code = 200
+    except:
+        ret = {"status": "ERROR"}
+        code = 500
+        response=make_response(json.dumps(ret),code)
+    return response
 

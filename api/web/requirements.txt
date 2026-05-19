@@ -1,4 +1,21 @@
-PyMySQL
+# Núcleo del servidor
 Flask==1.1.4
-markupsafe==2.0.1
+# Es vital fijar estas versiones para evitar errores de importación en Flask 1.x
+Werkzeug==1.0.1
+itsdangerous==1.1.0
+MarkupSafe==2.0.1
+
+# Base de Datos
+PyMySQL
+
+# Seguridad y Criptografía
+# Sustituimos CSRFProtect por el paquete real:
+Flask-WTF
+bcrypt
+bleach
+
+# Utilidades
 python-dotenv
+
+# Recomendado para producción (Docker)
+gunicorn

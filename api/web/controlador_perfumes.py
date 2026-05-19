@@ -1,16 +1,16 @@
 from bd import obtener_conexion
 import sys
-from funciones_auxiliares import calcularIVA
+from funciones_auxiliares import calcularIVA, sanitize_field
 
 def convertir_perfume_a_json(perfume):
-    d = {}
-    d['id'] = perfume[0]
-    d['nombre'] = perfume[1]
-    d['descripcion'] = perfume[2]
-    d['precio'] = float(perfume[3])
-    d['foto'] = perfume[4]
-    d['notas']=perfume[5]
-    return d
+    return{
+        'id': perfume[0],
+        'nombre': sanitize_field(perfume[1]),
+        'descripcion': sanitize_field(perfume[2]),
+        'precio': float(perfume[3]),
+        'foto': sanitize_field(perfume[4]),
+        'notas': sanitize_field(perfume[5])
+    }
 
 def insertar_perfume(nombre, descripcion, precio,foto,notas):
     conexion = obtener_conexion()
@@ -61,7 +61,7 @@ def obtener_perfume_por_id(id):
     try:
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT id, nombre, descripcion, precio,foto,notas FROM perfumes WHERE id =" + id)
+            cursor.execute("SELECT id, nombre, descripcion, precio,foto,notas FROM perfumes WHERE id = %s", (id))
             perfume = cursor.fetchone()
             if perfume is not None:
                 perfumejson = convertir_perfume_a_json(perfume)
@@ -106,4 +106,6 @@ def actualizar_perfume(id, nombre, descripcion, precio, foto,notas):
         print("Excepcion al actualziar una perfume", flush=True)
         ret = {"status": "Failure" }
         code=500
+    finally:
+        if conexion: conexion.close()
     return ret,code

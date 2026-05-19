@@ -17,13 +17,19 @@
         }
     </style>
     <script>
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
         function verComentarios() {
-            location.href="comentarios.html";
+            location.href = "comentarios.html";
         }
+
         function conectar() {
+            // Ocultamos el error al intentar un nuevo login
             document.getElementsByClassName("error")[0].style.display = "none";
+            
+            // CORRECCIÓN: Inicializamos las cabeceras limpias dentro de la función
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            // Recogemos las credenciales
             var raw = JSON.stringify({
                 "username": document.getElementById("username").value,
                 "password": document.getElementById("password").value
@@ -35,25 +41,43 @@
                 body: raw
             };
 
+            // Realizamos la petición al endpoint exento de CSRF
             fetch("/api/usuarios/login", requestOptions)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        // Si el servidor responde con 400, 401 o 500, saltamos al catch
+                        throw new Error("Fallo en la respuesta del servidor");
+                    }
+                    return response.json();
+                })
                 .then(result => {
                     if (result.status == "OK") {
+                        // Guardamos el token CSRF que nos devuelve el backend en el almacenamiento local
+                        // por si lo necesitas para futuras peticiones autenticadas (como añadir perfumes)
+                        if (result.csrf_token) {
+                            localStorage.setItem("csrf_token", result.csrf_token);
+                        }
+                        
+                        // Redirección exitosa
                         location.href = "perfumes.html";
                     } else {
+                        // Mostramos el mensaje de error si las credenciales fallan o el usuario está bloqueado
                         document.getElementsByClassName("error")[0].style.display = "block";
                     }
                 })
-                .catch(error => console.log('error', error));
+                .catch(error => {
+                    console.log('error', error);
+                    alert("Error al conectar con el servidor. Revisa las credenciales o la consola.");
+                });
         }
     </script>
 </head>
 
 <body>
     <h1>BIENVENIDO AL SISTEMA DE DANIEL E ISHAK PERFUMES</h1>
-    <label>Usuario</label><input type="text" name="username" id="username"><br>
-    <label>Clave</label><input type="password" name="password" id="password"><br>
-    <label class="error">Usuario/clave erronea</label>
+    <label>Usuario</label><input type="text" name="username" id="username" required><br>
+    <label>Clave</label><input type="password" name="password" id="password" required><br>
+    <label class="error">Usuario/clave erronea o cuenta bloqueada</label>
     <button type="button" onclick="conectar()">ENVIAR</button>
     <button type="button" onclick="location.href='registro.html'">REGISTRARSE</button>
 

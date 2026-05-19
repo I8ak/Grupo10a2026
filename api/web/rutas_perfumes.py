@@ -1,18 +1,22 @@
-from flask import request, Blueprint, jsonify
+from flask import request, Blueprint, jsonify, make_response
 import controlador_perfumes
-from funciones_auxiliares import Encoder
+from funciones_auxiliares import Encoder, validar_session_normal
 
 bp = Blueprint('perfumes', __name__)
 
 @bp.route("/",methods=["GET"])
 def perfumes():
-    respuesta,code= controlador_perfumes.obtener_perfumes()
-    return jsonify(respuesta), code
+    if (validar_session_normal()):
+        respuesta,code= controlador_perfumes.obtener_perfumes()
+    else:
+        respuesta={"status":"Unauthorized"}
+        code=403
+    return make_response(jsonify(respuesta), code)
     
 @bp.route("/<id>",methods=["GET"])
 def perfume_por_id(id):
     respuesta,code = controlador_perfumes.obtener_perfume_por_id(id)
-    return jsonify(respuesta), code
+    return make_response(jsonify(respuesta), code)
 
 @bp.route("/",methods=["POST"])
 def guardar_perfume():
@@ -28,12 +32,12 @@ def guardar_perfume():
     else:
         respuesta={"status":"Bad request"}
         code=401
-    return jsonify(respuesta), code
+    return make_response(jsonify(respuesta), code)
 
 @bp.route("/<int:id>", methods=["DELETE"])
 def eliminar_perfume(id):
     respuesta,code=controlador_perfumes.eliminar_perfume(id)
-    return jsonify(respuesta), code
+    return make_response(jsonify(respuesta), code)
 
 @bp.route("/", methods=["PUT"])
 def actualizar_perfume():
@@ -50,5 +54,5 @@ def actualizar_perfume():
     else:
         respuesta={"status":"Bad request"}
         code=401
-    return jsonify(respuesta), code
+    return make_response(jsonify(respuesta), code)
 

@@ -16,11 +16,14 @@
         }
     </style>
     <script>
-        var myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-
         function conectar(){
             document.getElementsByClassName("error")[0].style.display="none";
+            
+            // Creamos las cabeceras de forma limpia en cada petición
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+
+            // Recogemos los datos (ahora "profile" sí se leerá porque es readonly)
             var raw = JSON.stringify({
                 "username": document.getElementById("username").value,
                 "password": document.getElementById("password").value,
@@ -33,17 +36,27 @@
                 body: raw
             };
 
+            // Ejecutamos la petición hacia el proxy de Apache
             fetch("/api/usuarios/registro", requestOptions)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        // Si devuelve 400, 401 o 500, lanzamos error para controlarlo abajo
+                        throw new Error("Error en la petición del servidor");
+                    }
+                    return response.json();
+                })
                 .then(result => {
-                    if (result.status=="OK"){
+                    if (result.status == "OK"){
                         alert("Usuario registrado correctamente");
-                        location.href="index.html";
+                        location.href = "index.html";
                     } else {
-                        document.getElementsByClassName("error")[0].style.display="block";
+                        document.getElementsByClassName("error")[0].style.display = "block";
                     }
                 })
-                .catch(error => console.log('error', error)); 
+                .catch(error => {
+                    console.log('error', error);
+                    alert("Error crítico en el registro. Revisa la consola del navegador.");
+                }); 
         }
     </script>
 </head>
@@ -51,8 +64,11 @@
     <h1>REGISTRO DEL SISTEMA</h1>
     <label>Usuario</label><input type="text" name="username" id="username" required><br>
     <label>Clave</label><input type="password" name="password" id="password" required><br>
-    <label>Perfil</label><input type="text" disabled name="profile" id="profile" value="normal"><br>
-    <label class="error">Usuario ya existe</label>
+    
+    <!-- CORRECCIÓN: Cambiado 'disabled' por 'readonly' para que JS pueda leer su valor -->
+    <label>Perfil</label><input type="text" readonly name="profile" id="profile" value="normal"><br>
+    
+    <label class="error">Usuario ya existe o datos inválidos</label>
     <button type="button" onclick="conectar()">ENVIAR</button>
 </body>
 </html>
