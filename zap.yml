@@ -20,13 +20,8 @@ env:
       users:
         - name: zap-user
           credentials:
-<<<<<<< HEAD
             username: $ZAP_USERNAME
             password: $ZAP_PASSWORD
-=======
-            username: root
-            password: 1234
->>>>>>> d2b7128f1da22f163fb24279c7e9bf750cb42d06
 
 jobs:
   - type: spider
