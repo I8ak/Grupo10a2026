@@ -45,7 +45,7 @@
                 headers: myHeaders,
             };
 
-            fetch("/api/perfumes/", requestOptions)
+            fetch("/api/perfumes", requestOptions)
                 .then(response => response.json())
                 .then(result => {
                     console.log(result);

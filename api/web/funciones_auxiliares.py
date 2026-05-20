@@ -72,11 +72,14 @@ def delete_session():
     session.clear()
 def validar_session_normal():
     try:
-        if (session["usuario"] and session["usuario"]!=""):
+        print(f"[DEBUG AUX] Validando sesión. Usuario en dict: {session.get('usuario')}", flush=True)
+        # .get() devuelve None si la clave no existe, evitando el KeyError
+        usuario = session.get("usuario")
+        if usuario and usuario != "":
             return True
-        else:
-            return False
-    except:
+        return False
+    except Exception as e:
+        print(f"[DEBUG AUX] Error en validar_session_normal: {e}", flush=True)
         return False
 def validar_session_admin():
     try:

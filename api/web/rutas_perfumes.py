@@ -1,16 +1,30 @@
-from flask import request, Blueprint, jsonify, make_response
+from flask import request, Blueprint, jsonify, make_response, session
 import controlador_perfumes
 from funciones_auxiliares import Encoder, validar_session_normal
 
 bp = Blueprint('perfumes', __name__)
 
-@bp.route("/",methods=["GET"])
+@bp.route("/", methods=["GET"], strict_slashes=False)
 def perfumes():
-    if (validar_session_normal()):
-        respuesta,code= controlador_perfumes.obtener_perfumes()
-    else:
-        respuesta={"status":"Unauthorized"}
-        code=403
+    print("[DEBUG ROUTE] ¡La petición HTTP ha entrado a la ruta /api/perfumes!", flush=True)
+    
+    try:
+        # Ahora sí funcionará porque importamos 'session'
+        print(f"[DEBUG ROUTE] Contenido actual de la sesión: {dict(session)}", flush=True)
+        
+        sesion_valida = validar_session_normal()
+        print(f"[DEBUG ROUTE] ¿La sesión es válida?: {sesion_valida}", flush=True)
+        
+        if sesion_valida:
+            respuesta, code = controlador_perfumes.obtener_perfumes()
+        else:
+            respuesta = {"status": "Unauthorized"}
+            code = 403
+    except Exception as e:
+        print(f"[DEBUG ROUTE] CRÍTICO: Excepción dentro de la ruta: {e}", flush=True)
+        respuesta = {"status": "Internal Error"}
+        code = 500
+        
     return make_response(jsonify(respuesta), code)
     
 @bp.route("/<id>",methods=["GET"])

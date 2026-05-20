@@ -21,7 +21,7 @@ def create_app():
     
     #app.config.from_pyfile('settings.py')
     csrf.init_app(app)
-    csrf.exempt('rutas_usuarios.bp')
+    
     #Configuración de la cabecera
     extra_headers=prepare_response_extra_headers(True)
     #Configuración de las sesiones con cookies
@@ -31,9 +31,15 @@ def create_app():
 
     @app.before_request
     def clean_request():
-        if request.is_json:
-            # Guardamos los datos ya limpios en un nuevo atributo del objeto request
-            request.cleaned_json = sanitize_field(request.get_json())
+        # Verificamos que tenga la cabecera JSON Y que el cuerpo de la petición NO esté vacío
+        if request.is_json and request.get_data(parse_form_data=False):
+            try:
+                # El parámetro silent=True evita que Flask lance un Error 400 si el JSON viene mal
+                datos_json = request.get_json(silent=True)
+                if datos_json is not None:
+                    request.cleaned_json = sanitize_field(datos_json)
+            except Exception as e:
+                print(f"[DEBUG APP] Error parseando JSON en before_request: {e}", flush=True)
 
 
     
@@ -44,19 +50,20 @@ def create_app():
     # Importar y registrar blueprints aquí (evita side-effects en import)
     from rutas_usuarios import bp as usuarios_bp
     app.register_blueprint(usuarios_bp, url_prefix='/api/usuarios')
-
+    csrf.exempt(usuarios_bp)
     from rutas_perfumes import bp as perfumes_bp
     app.register_blueprint(perfumes_bp, url_prefix='/api/perfumes')
-
+    csrf.exempt(usuarios_bp)
     from rutas_ficheros import bp as ficheros_bp
     app.register_blueprint(ficheros_bp, url_prefix='/api/ficheros')
-
+    csrf.exempt(usuarios_bp)
     from rutas_comentarios import bp as comentarios_bp
     app.register_blueprint(comentarios_bp, url_prefix='/api/comentarios')
-
+    csrf.exempt(usuarios_bp)
     @app.errorhandler(500)
     def server_error(error):
-        print('An exception occurred during a request. ERROR:' + error, flush=True)
+        # Corregido usando f-string para evitar fallos de concatenación
+        print(f'An exception occurred during a request. ERROR: {error}', flush=True)
         ret={"status": "Internal Server Error"}
         return jsonify(ret), 500
 

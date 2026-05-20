@@ -34,7 +34,7 @@ def obtener_perfumes():
             # Ejecutamos la consulta
             cursor.execute("SELECT id, nombre, descripcion, precio, foto, notas FROM perfumes")
             perfumes = cursor.fetchall()
-            
+            print(f"[DEBUG LOG] Ha llegado a obtener todos los perfumes", flush=True)
             if perfumes:
                 for perfume in perfumes:
                     # Convertimos la tupla/fila a un diccionario JSON
@@ -60,8 +60,9 @@ def obtener_perfume_por_id(id):
     perfumejson = {}
     try:
         conexion = obtener_conexion()
+        print(f"[DEBUG LOG] Ha llegado a obtener los perfumes por id", flush=True)
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT id, nombre, descripcion, precio,foto,notas FROM perfumes WHERE id = %s", (id))
+            cursor.execute("SELECT id, nombre, descripcion, precio,foto,notas FROM perfumes WHERE id = %s", (id,))
             perfume = cursor.fetchone()
             if perfume is not None:
                 perfumejson = convertir_perfume_a_json(perfume)
