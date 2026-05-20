@@ -1,5 +1,5 @@
 from __future__ import print_function
-from flask import request, Blueprint, jsonify, make_response
+from flask import request, Blueprint, jsonify, make_response, session
 from funciones_auxiliares import Encoder
 import controlador_usuarios
 import json
@@ -42,15 +42,24 @@ def registro():
     return make_response(jsonify(respuesta), code)
 
 
-@bp.route("/logout",methods=['GET'])
+@bp.route("/logout", methods=['GET'])
 def logout():
     try:
+        # 1. Llamamos al controlador (aunque ahora solo devuelve un diccionario estático)
         controlador_usuarios.logout()
+        
+        # 2. ¡MUY IMPORTANTE!: Destruimos físicamente la sesión en el servidor
+        # Esto borra las cookies y limpia session['usuario'], session['perfil'], etc.
+        session.clear() 
+        
         ret = {"status": "OK"}
         code = 200
-    except:
+    except Exception as e:
+        print(f"[DEBUG ROUTE] Error en el proceso de logout: {e}", flush=True)
         ret = {"status": "ERROR"}
         code = 500
-        response=make_response(json.dumps(ret),code)
+
+    # 3. Construimos y retornamos la respuesta de forma segura fuera del bloque try/except
+    response = make_response(jsonify(ret), code)
     return response
 
