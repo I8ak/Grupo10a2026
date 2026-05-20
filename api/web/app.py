@@ -20,7 +20,7 @@ def create_app():
     )
     
     #app.config.from_pyfile('settings.py')
-    csrf.init_app(app)
+    #csrf.init_app(app)
     
     #Configuración de la cabecera
     extra_headers=prepare_response_extra_headers(True)
@@ -47,7 +47,7 @@ def create_app():
     csrf.exempt('rutas_usuarios.bp')
     from rutas_perfumes import bp as perfumes_bp
     app.register_blueprint(perfumes_bp, url_prefix='/api/perfumes')
-
+    csrf.exempt(perfumes_bp)
     from rutas_ficheros import bp as ficheros_bp
     app.register_blueprint(ficheros_bp, url_prefix='/api/ficheros')
 
