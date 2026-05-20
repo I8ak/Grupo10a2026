@@ -90,29 +90,32 @@ def eliminar_perfume(id):
         code=500
     return ret,code
 
-def actualizar_perfume(id, nombre, descripcion, precio, foto,notas):
+def actualizar_perfume(id, nombre, descripcion, precio, foto, notas):
+    conexion = None
     try:
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
-            cursor.execute("UPDATE perfumes SET nombre = %s, descripcion = %s, precio = %s, foto=%s, notas=%s WHERE id = %s",
-                       (nombre, descripcion, precio, foto,notas,id))
+            cursor.execute(
+                "UPDATE perfumes SET nombre = %s, descripcion = %s, precio = %s, foto=%s, notas=%s WHERE id = %s",
+                (nombre, descripcion, precio, foto, notas, id)
+            )
             if cursor.rowcount == 1:
-                ret={"status": "OK" }
+                ret = {"status": "OK"}
             else:
-                ret={"status": "Failure" }
+                ret = {"status": "Failure"}
         conexion.commit()
-        try:
-            if conexion:
-                # Comprobamos si la conexión sigue abierta antes de intentar cerrarla
-                if conexion.open: 
-                    conexion.close()
-        except Exception as e:
-            print(f"[DEBUG CONTROLADOR] La conexión ya estaba cerrada o falló al cerrar: {e}", flush=True)
-        code=200
-    except:
-        print("Excepcion al actualziar una perfume", flush=True)
-        ret = {"status": "Failure" }
-        code=500
+        code = 200
+    except Exception as e:
+        print(f"Excepcion al actualizar un perfume: {e}", flush=True)
+        ret = {"status": "Failure"}
+        code = 500
     finally:
-        if conexion: conexion.close()
-    return ret,code
+        # El bloque finally se ejecuta SIEMPRE. Lo blindamos aquí:
+        if conexion:
+            try:
+                conexion.close()
+            except Exception:
+                # Si ya se cerró o da error, nos da igual, la petición debe continuar
+                pass
+                
+    return ret, code
