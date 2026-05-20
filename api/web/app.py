@@ -50,18 +50,14 @@ def create_app():
     # Importar y registrar blueprints aquí (evita side-effects en import)
     from rutas_usuarios import bp as usuarios_bp
     app.register_blueprint(usuarios_bp, url_prefix='/api/usuarios')
-<<<<<<< HEAD
     csrf.exempt(usuarios_bp)
-=======
     csrf.exempt('rutas_usuarios.bp')
->>>>>>> bc53644d88dc86cac06b3802720b07e39a469fcc
+
     from rutas_perfumes import bp as perfumes_bp
     app.register_blueprint(perfumes_bp, url_prefix='/api/perfumes')
-<<<<<<< HEAD
     csrf.exempt(usuarios_bp)
-=======
     csrf.exempt(perfumes_bp)
->>>>>>> 42148986660feb89512a802cc414edacf94811b5
+
     from rutas_ficheros import bp as ficheros_bp
     app.register_blueprint(ficheros_bp, url_prefix='/api/ficheros')
     csrf.exempt(usuarios_bp)
