@@ -101,7 +101,13 @@ def actualizar_perfume(id, nombre, descripcion, precio, foto,notas):
             else:
                 ret={"status": "Failure" }
         conexion.commit()
-        conexion.close()
+        try:
+            if conexion:
+                # Comprobamos si la conexión sigue abierta antes de intentar cerrarla
+                if conexion.open: 
+                    conexion.close()
+        except Exception as e:
+            print(f"[DEBUG CONTROLADOR] La conexión ya estaba cerrada o falló al cerrar: {e}", flush=True)
         code=200
     except:
         print("Excepcion al actualziar una perfume", flush=True)
