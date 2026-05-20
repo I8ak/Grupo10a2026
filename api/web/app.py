@@ -16,10 +16,12 @@ def create_app():
         DB_PASSWORD=os.getenv('DB_PASSWORD'),
         DB_NAME=os.getenv('DB_NAME'),
         DB_PORT=os.getenv('DB_PORT', '3306'),
+        WTF_CSRF_ENABLED=False
     )
     
     #app.config.from_pyfile('settings.py')
     csrf.init_app(app)
+    csrf.exempt('rutas_usuarios.bp')
     #Configuración de la cabecera
     extra_headers=prepare_response_extra_headers(True)
     #Configuración de las sesiones con cookies

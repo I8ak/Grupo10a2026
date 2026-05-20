@@ -1,25 +1,21 @@
 from __future__ import print_function
-from flask import request,Blueprint, jsonify, make_response
+from flask import request, Blueprint, jsonify, make_response
 from funciones_auxiliares import Encoder
 import controlador_usuarios
-from app import csrf
 import json
 
 bp = Blueprint('usuarios', __name__)
 
-@bp.route("/login",methods=['POST'], strict_slashes=False)
-@csrf.exempt
+@bp.route("/login", methods=['POST'], strict_slashes=False)
 def login():
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
-        # CORRECCIÓN: Usamos obligatoriamente los datos sanitizados
         login_json = request.cleaned_json
-        
-        if "username" in login_json and "password" in login_json:
+        if login_json and "username" in login_json and "password" in login_json:
             username = login_json['username']
             password = login_json['password']
             if isinstance(username, str) and isinstance(password, str) and len(username) < 50 and len(password) < 50:
-                respuesta,code= controlador_usuarios.login_usuario(username,password)
+                respuesta, code = controlador_usuarios.login_usuario(username, password)
             else:
                 respuesta = {"status": "Bad parameters"}
                 code = 401
@@ -27,24 +23,22 @@ def login():
             respuesta = {"status": "Bad request"}
             code = 401
     else:
-        respuesta={"status":"Bad request"}
-        code=401
+        respuesta = {"status": "Bad request"}
+        code = 401
     return make_response(jsonify(respuesta), code)
 
-@bp.route("/registro",methods=['POST'], strict_slashes=False)
-@csrf.exempt
+@bp.route("/registro", methods=['POST'], strict_slashes=False)
 def registro():
     content_type = request.headers.get('Content-Type')
     if (content_type == 'application/json'):
-        # CORRECCIÓN: Usamos obligatoriamente los datos sanitizados
         login_json = request.cleaned_json
         username = login_json['username']
         password = login_json['password']
         profile = login_json['profile']
-        respuesta,code= controlador_usuarios.alta_usuario(username,password,profile)
+        respuesta, code = controlador_usuarios.alta_usuario(username, password, profile)
     else:
-        respuesta={"status":"Bad request"}
-        code=401
+        respuesta = {"status": "Bad request"}
+        code = 401
     return make_response(jsonify(respuesta), code)
 
 

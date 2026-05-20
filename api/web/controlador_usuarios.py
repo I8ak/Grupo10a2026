@@ -5,7 +5,8 @@ from flask import current_app as app
 from funciones_auxiliares import cipher_password, compare_password, create_session
 from flask_wtf.csrf import generate_csrf
 
-def login_usuario(username,password):
+def login_usuario(username, password):
+    conexion = None
     try:
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
@@ -15,15 +16,17 @@ def login_usuario(username,password):
             )
             usuario = cursor.fetchone()
             
+            # CORRECCIÓN 1: Si no existe el usuario, salimos de la función INMEDIATAMENTE
             if usuario is None:
-                ret = {"status": "ERROR","mensaje":"Usuario/clave erroneo" }
-            else:
-                ret = {"status": "OK" }
+                return {"status": "ERROR", "mensaje": "Usuario/clave erroneo"}, 200
                 
-            perfil,password_hash, num_erroneos = usuario
-            hoy =dt.date.today().strftime("%Y-%m-%d")
-            
-            if compare_password(password, password_hash):
+            # Ahora sí es seguro desempaquetar la tupla porque sabemos que existe
+            perfil, password_hash, num_erroneos = usuario
+            hoy = dt.date.today().strftime("%Y-%m-%d")
+            print(f"[DEBUG LOG] Contraseña introducida en plano: {password}", flush=True)
+            print(f"[DEBUG LOG] Hash recuperado de la BD: {password_hash}", flush=True)
+            # Comparamos la clave en texto plano del fetch con el hash de la BD
+            if compare_password(password_hash, password):
                 ret = {
                     "status": "OK",
                     "perfil": perfil,
@@ -31,7 +34,7 @@ def login_usuario(username,password):
                 }
                 create_session(username, perfil)
                 app.logger.info("Acceso correcto: Usuario %s", username)
-                create_session(username, perfil)
+                
                 cursor.execute(
                     "UPDATE usuarios SET numeroAccesosErroneo=0, fechaUltimoAcceso=%s, estado='activo' WHERE usuario = %s",
                     (hoy, username)
@@ -39,6 +42,7 @@ def login_usuario(username,password):
                 conexion.commit()
                 return ret, 200
             else:
+                # Si la clave no coincide, sumamos un intento erróneo
                 num_erroneos += 1
                 estado = 'bloqueado' if num_erroneos > 2 else 'activo'
                 cursor.execute(
@@ -46,18 +50,15 @@ def login_usuario(username,password):
                     (num_erroneos, estado, username)
                 )
                 conexion.commit()
-                ret = {
-                    "status": "ERROR",
-                    "mensaje": "Usuario/clave erroneo"
-                }
-    except:
-        print("Excepcion al validar al usuario", flush=True)   
-        ret={"status":"ERROR"}
-        code=500
+                return {"status": "ERROR", "mensaje": "Usuario/clave erroneo"}, 200
+                
+    except Exception as e:
+        print(f"Excepcion al validar al usuario: {e}", flush=True)   
+        ret = {"status": "ERROR"}
+        return ret, 500
     finally:
         if conexion:
             conexion.close()
-    return ret,200
 
 def alta_usuario(username,password,perfil):
     conexion = None
