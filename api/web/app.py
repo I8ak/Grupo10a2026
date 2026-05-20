@@ -21,7 +21,7 @@ def create_app():
     
     #app.config.from_pyfile('settings.py')
     csrf.init_app(app)
-    csrf.exempt('rutas_usuarios.bp')
+    
     #Configuración de la cabecera
     extra_headers=prepare_response_extra_headers(True)
     #Configuración de las sesiones con cookies
@@ -44,7 +44,7 @@ def create_app():
     # Importar y registrar blueprints aquí (evita side-effects en import)
     from rutas_usuarios import bp as usuarios_bp
     app.register_blueprint(usuarios_bp, url_prefix='/api/usuarios')
-
+    csrf.exempt('rutas_usuarios.bp')
     from rutas_perfumes import bp as perfumes_bp
     app.register_blueprint(perfumes_bp, url_prefix='/api/perfumes')
 
