@@ -40,10 +40,14 @@ services:
     build: ./apache
     container_name: apachea10
     restart: unless-stopped
-    ports: ["60010:80"]
+    ports:
+      - "60443:8443"
+    environment:
+      - SSL_ENGINE=on
+      - PARANOIA=1
+      - ALLOWED_METHODS=GET HEAD POST OPTIONS PUT DELETE
     depends_on:
       pythona10:
         condition: service_started
-
 volumes:
   mariadb-dataa10:

@@ -16,16 +16,13 @@ def login_usuario(username, password):
             )
             usuario = cursor.fetchone()
             
-            # CORRECCIÓN 1: Si no existe el usuario, salimos de la función INMEDIATAMENTE
             if usuario is None:
                 return {"status": "ERROR", "mensaje": "Usuario/clave erroneo"}, 200
                 
-            # Ahora sí es seguro desempaquetar la tupla porque sabemos que existe
             perfil, password_hash, num_erroneos = usuario
             hoy = dt.date.today().strftime("%Y-%m-%d")
             print(f"[DEBUG LOG] Contraseña introducida en plano: {password}", flush=True)
             print(f"[DEBUG LOG] Hash recuperado de la BD: {password_hash}", flush=True)
-            # Comparamos la clave en texto plano del fetch con el hash de la BD
             if compare_password(password_hash, password):
                 ret = {
                     "status": "OK",
@@ -42,7 +39,6 @@ def login_usuario(username, password):
                 conexion.commit()
                 return ret, 200
             else:
-                # Si la clave no coincide, sumamos un intento erróneo
                 num_erroneos += 1
                 estado = 'bloqueado' if num_erroneos > 2 else 'activo'
                 cursor.execute(
@@ -62,7 +58,6 @@ def login_usuario(username, password):
 
 def alta_usuario(username,password,perfil):
     conexion = None
-    # Inicializamos valores por si acaso
     ret = {"status": "ERROR"}
     code = 500
     try:

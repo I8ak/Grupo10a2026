@@ -110,12 +110,10 @@ def actualizar_perfume(id, nombre, descripcion, precio, foto, notas):
         ret = {"status": "Failure"}
         code = 500
     finally:
-        # El bloque finally se ejecuta SIEMPRE. Lo blindamos aquí:
         if conexion:
             try:
                 conexion.close()
             except Exception:
-                # Si ya se cerró o da error, nos da igual, la petición debe continuar
                 pass
                 
     return ret, code

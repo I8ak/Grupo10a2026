@@ -7,7 +7,7 @@ import subprocess
 def guardar_fichero(nombre,contenido):
     try:
         print(nombre, flush=True)
-        basepath = os.path.dirname(__file__) # ruta del archivo actual
+        basepath = os.path.dirname(__file__) 
         print(basepath, flush=True)
         ruta_fichero = os.path.join (basepath,'static/archivos',nombre) 
         print('Archivo guardado en ' +  ruta_fichero, flush=True)
@@ -22,7 +22,7 @@ def guardar_fichero(nombre,contenido):
 
 def ver_fichero(nombre):
     try:
-        basepath = os.path.dirname(__file__) # ruta del archivo actual
+        basepath = os.path.dirname(__file__) 
         ruta_fichero = os.path.join (basepath,'static/archivos',nombre) 
         salida=subprocess.getoutput("cat " + ruta_fichero)
         respuesta={"contenido": salida}

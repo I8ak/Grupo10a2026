@@ -50,13 +50,9 @@ def prepare_response_extra_headers(include_security_headers):
     }
     if include_security_headers:
         response_security_headers = {
-            # X-Frame-Options: page can only be shown in an iframe of the same site
             'X-Frame-Options': 'SAMEORIGIN',
-            # ensure all app communication is sent over HTTPS
             'Strict-Transport-Security': 'max-age=63072000; includeSubdomains',
-            # instructs the browser not to override the response content type
             'X-Content-Type-Options': 'nosniff',
-            # enable browser cross-site scripting (XSS) filter
             'X-XSS-Protection': '1; mode=block'
         }
         response_extra_headers.update(response_security_headers)
@@ -73,7 +69,6 @@ def delete_session():
 def validar_session_normal():
     try:
         print(f"[DEBUG AUX] Validando sesión. Usuario en dict: {session.get('usuario')}", flush=True)
-        # .get() devuelve None si la clave no existe, evitando el KeyError
         usuario = session.get("usuario")
         if usuario and usuario != "":
             return True

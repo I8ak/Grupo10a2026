@@ -45,11 +45,8 @@ def registro():
 @bp.route("/logout", methods=['GET'])
 def logout():
     try:
-        # 1. Llamamos al controlador (aunque ahora solo devuelve un diccionario estático)
         controlador_usuarios.logout()
         
-        # 2. ¡MUY IMPORTANTE!: Destruimos físicamente la sesión en el servidor
-        # Esto borra las cookies y limpia session['usuario'], session['perfil'], etc.
         session.clear() 
         
         ret = {"status": "OK"}
@@ -59,7 +56,6 @@ def logout():
         ret = {"status": "ERROR"}
         code = 500
 
-    # 3. Construimos y retornamos la respuesta de forma segura fuera del bloque try/except
     response = make_response(jsonify(ret), code)
     return response
 
